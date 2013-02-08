@@ -28,23 +28,25 @@ public class VoiceService {
 
     public void talk(String alerta) throws IOException, JavaLayerException {
         
-        logger.info("Mensaje de alerta: {}",alerta);
+        logger.info("Mensaje a hablar: {}",alerta);
         
-        InputStream sound = audio.getAudio(alerta, getIdioma());
+        InputStream sound = audio.getAudio(alerta, getLanguage());
         audio.play(sound);
     }
 
     /**
-     * @return the idioma
+     * @return the language
      */
-    public String getIdioma() {
+    public String getLanguage() {
         return language;
     }
 
     /**
-     * @param idioma the idioma to set
+     * @param language the language to set
      */
-    public void setIdioma(String idioma) {
-        this.language = idioma;
+    public void setLanguage(String language) {
+        this.language = language;
     }
+
+    
 }
