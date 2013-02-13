@@ -4,7 +4,7 @@ Aplicación java que habla los resultados de Jenkins. Esta aplicación está des
 
 Compilación y ejecución
 =======================
-Clonar el proyecto, ejecutar el comando “mvn install“, este comando genera tres distribuibles en el directorio target, solo hay que descomprimir el archivo en un directorio y ejecutar la aplicación.
+Clonar el proyecto, ejecutar el comando `mvn install`, este comando genera tres distribuibles en el directorio target, solo hay que descomprimir el archivo en un directorio y ejecutar la aplicación.
 ```
 java -jar jenkins-speech-1.0.RELEASE.jar
 ```
