@@ -35,7 +35,7 @@
     <int:inbound-channel-adapter id="gatewayTrigger"
                                  channel="requestChannel" 
                                  expression="new java.util.Date() +' - Request Jenkins' ">
-        <int:poller fixed-rate="${trigger.request.fixedRate}"/>
+        <int:poller cron="${trigger.request.cron}"/>
     </int:inbound-channel-adapter>
         
     <!-- Factory http -->
@@ -77,8 +77,9 @@
     <int:service-activator input-channel="speechService" ref="voiceService" method="talk"/>
     
     <bean id="voiceService" class="com.parivero.jenkins.speech.service.VoiceService">
-        <property name="idioma" value="${language}"/>
+        <property name="language" value="${language}"/>
     </bean>
+    
     
     
 </beans>
