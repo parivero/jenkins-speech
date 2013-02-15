@@ -5,38 +5,27 @@
        xmlns:int-http="http://www.springframework.org/schema/integration/http"
        xmlns:int-groovy="http://www.springframework.org/schema/integration/groovy"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.2.xsd
+       		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.2.xsd
 		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-2.2.xsd
                 http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy.xsd">
     
-    
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:jenkins-speech.properties"/>
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
-
-    <!-- logger -->
-    <int:logging-channel-adapter id="logger" log-full-message="true" level="INFO"/>
     
-    <!-- logger que imprime el json de manera legible -->
-    <int:logging-channel-adapter id="loggerJson" expression="new groovy.json.JsonOutput().prettyPrint(payload)" level="DEBUG"/>
-                        
-    <int:channel id="requestChannel">
-        <int:interceptors>
-            <int:wire-tap channel="logger"/>
-        </int:interceptors>
-    </int:channel>
-    <int:channel id="jobsChannel">
-        <int:interceptors>
-            <int:wire-tap channel="loggerJson"/>
-        </int:interceptors>
-    </int:channel>
     <!-- Lo utilizo como cron para ejecutar el gateway -->
     <int:inbound-channel-adapter id="gatewayTrigger"
                                  channel="requestChannel" 
                                  expression="new java.util.Date() +' - Request Jenkins' ">
         <int:poller cron="${trigger.request.cron}"/>
     </int:inbound-channel-adapter>
+    
+    <!-- Canal que dispara la petición a Jenkins -->
+    <int:channel id="requestChannel">
+        <int:interceptors>
+            <int:wire-tap channel="logger"/>
+        </int:interceptors>
+    </int:channel>
         
     <!-- Factory http -->
     <bean id="requestFactory"
@@ -56,8 +45,15 @@
                                reply-channel="jobsChannel">
     </int-http:outbound-gateway>
     
+    <!-- Canal que contiene el response de Jenkins -->
+    <int:channel id="jobsChannel">
+        <int:interceptors>
+            <int:wire-tap channel="loggerJson"/>
+        </int:interceptors>
+    </int:channel>
+        
     <!-- Cadena de transformadores y filtros  -->
-    <int:chain input-channel="jobsChannel" output-channel="speechService">
+    <int:chain input-channel="jobsChannel" output-channel="voiceServiceChannel">
         <int:json-to-object-transformer type="com.parivero.jenkins.speech.domain.Response"/>
         <!-- Obtengo la colección de jobs -->
         <int:splitter expression="payload.jobs"/>
@@ -66,20 +62,24 @@
         <int:filter expression="payload.lastBuild != null"/>
         <!-- Proceso solo la ejecuciones recientes -->
         <int:filter 
-            expression=" payload.lastBuild.timestamp +payload.lastBuild.duration &gt;= (new java.util.Date().getTime() - ${trigger.request.fixedRate})"/>
-         <!--Script Groovy encargado de armar el mensaje.--> 
+            expression="payload.lastBuild.timestamp + payload.lastBuild.duration &gt;= (new java.util.Date().getTime()  - ${trigger.request.fixedRate})"/>
+        <!--Script Groovy encargado de armar el mensaje.--> 
         <int:transformer>                     
             <int-groovy:script location="classpath:${transformer.groovy.script}" />
         </int:transformer>
     </int:chain>
     
-    <!-- Servicio que convierte el texto en audio medinate google translator-->
-    <int:service-activator input-channel="speechService" ref="voiceService" method="talk"/>
+    <!--Servicio que convierte el texto en audio medinate google translator-->
+    <int:service-activator input-channel="voiceServiceChannel" ref="voiceService" method="talk"/>
     
     <bean id="voiceService" class="com.parivero.jenkins.speech.service.VoiceService">
-        <property name="language" value="${language}"/>
+        <property name="language" value="${jenkins.speech.language}"/>
     </bean>
+
+    <!-- logger -->
+    <int:logging-channel-adapter id="logger" log-full-message="true" level="INFO"/>
     
-    
+    <!-- logger que imprime el json de manera legible -->
+    <int:logging-channel-adapter id="loggerJson" expression="new groovy.json.JsonOutput().prettyPrint(payload)" level="DEBUG"/>    
     
 </beans>
