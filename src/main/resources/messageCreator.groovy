@@ -54,6 +54,7 @@ if (messageList == null) {
     println "El proyecto ${nombreProyecto} tiene el estado ${result} que es desconocido para el sistema";
     mensaje = "El sistema no puede reconocer el estado ${result} con el que terminó el proyecto ${nombreProyecto}";
 } else {
+    // Se obtiene de manera aleatoria el mensaje a reproducir.
     mensaje = messageList[random.nextInt(messageList.size())];
 }
 

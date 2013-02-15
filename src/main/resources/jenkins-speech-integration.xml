@@ -54,15 +54,19 @@
         
     <!-- Cadena de transformadores y filtros  -->
     <int:chain input-channel="jobsChannel" output-channel="voiceServiceChannel">
-        <int:json-to-object-transformer type="com.parivero.jenkins.speech.domain.Response"/>
+        <!-- Transforma el string en un objeto en el payloas -->
+        <int:transformer >
+            <int-groovy:script location="jsonToObjectTransformer.groovy"/>
+        </int:transformer>
+        <!--<int:json-to-object-transformer type="com.parivero.jenkins.speech.domain.Response" />-->
         <!-- Obtengo la colección de jobs -->
         <int:splitter expression="payload.jobs"/>
         <!-- A partir de aqui se procesan los jobs uno a uno -->
         <!-- Proceso solo los jobs activos -->
         <int:filter expression="payload.lastBuild != null"/>
         <!-- Proceso solo la ejecuciones recientes -->
-        <int:filter 
-            expression="payload.lastBuild.timestamp + payload.lastBuild.duration &gt;= (new java.util.Date().getTime()  - ${trigger.request.fixedRate})"/>
+<!--        <int:filter 
+            expression="payload.lastBuild.timestamp + payload.lastBuild.duration &gt;= (T(java.lang.System).currentTimeMillis()  - ${trigger.request.fixedRate})"/>-->
         <!--Script Groovy encargado de armar el mensaje.--> 
         <int:transformer>                     
             <int-groovy:script location="classpath:${transformer.groovy.script}" />
