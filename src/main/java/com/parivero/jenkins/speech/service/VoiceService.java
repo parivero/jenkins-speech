@@ -23,7 +23,8 @@ public class VoiceService {
     private static Logger logger = LoggerFactory.getLogger(VoiceService.class);
     private String language;
     private Audio audio;
-    private String preSound;
+    private String preSoundFile;
+    private File file;
 
     public VoiceService() throws FileNotFoundException {
         audio = Audio.getInstance();
@@ -34,8 +35,8 @@ public class VoiceService {
 
         logger.info("Mensaje a hablar: {}", message);
 
-        if (!preSound.isEmpty()) {
-            InputStream startSound = getResource(preSound);
+        if (!preSoundFile.isEmpty()) {
+            InputStream startSound = getResource(preSoundFile);
             audio.play(startSound);
         }
 
@@ -43,14 +44,21 @@ public class VoiceService {
         audio.play(sound);
 
     }
-    
+
+    private File getFile(String path) {
+        if (file == null) {
+            file = new File(path);
+        }
+        return file;
+    }
+
     private InputStream getResource(String path) throws IOException {
-        
-        File file = new File(path);
+
+        file = getFile(path);
         if (file.exists()) {
             return new FileInputStream(file);
         }
-        
+
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
     }
 
@@ -72,8 +80,6 @@ public class VoiceService {
      * @param preSound the preSound to set
      */
     public void setPreSound(String preSound) {
-        this.preSound = preSound;
+        this.preSoundFile = preSound;
     }
-
-    
 }
