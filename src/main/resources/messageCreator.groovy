@@ -16,8 +16,10 @@ String result = payload.lastBuild.result == null ? "BUILDING" : payload.lastBuil
 
 // Listas para crear mensajes dependiendo del estado
 List listBuilding = ["El proyecto ${nombreProyecto} se esta ejecutando. Sale con fritas !!!!", 
-                    "Aguanta un rato que el proyecto ${nombreProyecto} se está ejecutando.",
-                    "20 pesos al proyecto ${nombreProyecto} que se esta ejecutando."];
+                    "Aguanta un rato, ${nombreProyecto}, se está ejecutando.",
+                    "20 pesos al proyecto ${nombreProyecto}, que esta en ejecución.",
+                    "Marche un ${nombreProyecto}, que comenzo su ejecución",
+                    "Acaba de partir el proyecto ${nombreProyecto}, le deseamos un buen viaje."];
 
 List listSuccess = ["El proyecto ${nombreProyecto} terminó exitosamente. FELICITACIONES !!!!",
                     "Quien lo diría. El proyecto ${nombreProyecto} terminó todo bien.",
@@ -28,17 +30,20 @@ List listSuccess = ["El proyecto ${nombreProyecto} terminó exitosamente. FELICI
 List listFail = ["El proyecto ${nombreProyecto} terminó con errores", 
                  "Macacos, el proyecto ${nombreProyecto} se hizo pelota y no funciona.",
                  "Se estrelló feo el proyecto ${nombreProyecto} y quedó como tirado en una zanja.",
-                 "Ojo muchachos que el proyecto ${nombreProyecto} terminó con errores"];
+                 "Ojo muchachos que el proyecto ${nombreProyecto} terminó con errores",
+                 "Pedile una ambulancia a ${nombreProyecto}, que quedo destruido"];
 
 List listUnstable = ["El proyecto ${nombreProyecto} terminó inestable", 
                      "El proyecto ${nombreProyecto} está hecho un flancito endeble, terminó todo raro.",
-                     "Pegale una mirada al proyecto ${nombreProyecto} que quedo inestable"];
+                     "Pegale una mirada al proyecto ${nombreProyecto} que quedo inestable",
+                     "${nombreProyecto} busca psicólogo, esta medio inestable.",
+                     "El proyecto ${nombreProyecto} está inestable como chigua gua esquizofrénico."];
 
 List listAborted = ["El proyecto ${nombreProyecto} fue abortado", 
                     "Ufff, y si se deciden? Abortaron la ejecución de ${nombreProyecto}",
                     "El proyecto ${nombreProyecto} hizo trabajar demás a Jenkins porque lo abortaron.",
                     "A ver quién abortó al proyecto ${nombreProyecto}, hay tabla",
-                     "Ojo al piojo que abortaron el proyecto ${nombreProyecto}"];
+                    "Ojo al piojo que abortaron el proyecto ${nombreProyecto}"];
 
 // Mapa donde se relacionan los estados con las listas
 Map messageMap = [SUCCESS:listSuccess,
