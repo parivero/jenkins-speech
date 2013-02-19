@@ -7,7 +7,7 @@ public class App {
 
     public static void main(String[] args) throws InterruptedException {
 
-        AbstractApplicationContext context = new ClassPathXmlApplicationContext("classpath:jenkins-speech-integration.xml");
+        AbstractApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring/jenkins-speech-integration.xml");
         context.registerShutdownHook();
 
     }
