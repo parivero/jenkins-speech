@@ -9,6 +9,7 @@
 		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-2.2.xsd
                 http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy.xsd">
     
+    
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:jenkins-speech.properties"/>
     </bean>
@@ -84,5 +85,18 @@
     
     <!-- logger que imprime el json de manera legible -->
     <int:logging-channel-adapter id="loggerJson" expression="new groovy.json.JsonOutput().prettyPrint(payload)" level="DEBUG"/>    
+    
+        <!-- Mediante esta configuración se utiliza el servicio de la aplicación annonce 
+         en lugar de reproducir el audio dentro de la misma aplicación  -->
+<!--    <int:channel id="voiceServiceChannel"/>
+    <int-http:outbound-channel-adapter channel="voiceServiceChannel" 
+                                       charset="UTF-8" 
+                                       url="${announcer.url.service}?text={text}&amp;language={language}" 
+                                       http-method="GET" >
+        <int-http:uri-variable name="text" expression="payload"/>
+        <int-http:uri-variable name="language" expression="${jenkins.speech.language}"/>
+    </int-http:outbound-channel-adapter>-->
+    
+    
     
 </beans>
