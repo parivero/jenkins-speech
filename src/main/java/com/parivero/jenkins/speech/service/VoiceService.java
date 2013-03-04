@@ -7,7 +7,6 @@ package com.parivero.jenkins.speech.service;
 import com.gtranslate.Audio;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import javazoom.jl.decoder.JavaLayerException;
@@ -26,22 +25,17 @@ public class VoiceService {
     private String preSoundFile;
     private File file;
 
-    public VoiceService() throws FileNotFoundException {
-        audio = Audio.getInstance();
-
-    }
-
     public void talk(String message) throws IOException, JavaLayerException {
 
         logger.info("Mensaje a hablar: {}", message);
 
         if (!preSoundFile.isEmpty()) {
             InputStream startSound = getResource(preSoundFile);
-            audio.play(startSound);
+            getAudio().play(startSound);
         }
 
-        InputStream sound = audio.getAudio(message, getLanguage());
-        audio.play(sound);
+        InputStream sound = getAudio().getAudio(message, getLanguage());
+        getAudio().play(sound);
 
     }
 
@@ -81,5 +75,19 @@ public class VoiceService {
      */
     public void setPreSound(String preSound) {
         this.preSoundFile = preSound;
+    }
+
+    /**
+     * @return the audio
+     */
+    public Audio getAudio() {
+        return audio;
+    }
+
+    /**
+     * @param audio the audio to set
+     */
+    public void setAudio(Audio audio) {
+        this.audio = audio;
     }
 }

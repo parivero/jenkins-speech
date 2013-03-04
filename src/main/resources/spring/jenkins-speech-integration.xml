@@ -4,20 +4,36 @@
        xmlns:int="http://www.springframework.org/schema/integration"
        xmlns:int-http="http://www.springframework.org/schema/integration/http"
        xmlns:int-groovy="http://www.springframework.org/schema/integration/groovy"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.2.xsd
 		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-2.2.xsd
-                http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy.xsd">
+                http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
     
+    
+    <!--    <int:channel-interceptor pattern="*Channel">
+        <int:wire-tap channel="logger"/>
+    </int:channel-interceptor>-->
     
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:jenkins-speech.properties"/>
+        <property name="localOverride" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="properties" ref="localProperties"/>
+            
     </bean>
+    
+    <util:properties id="localProperties">
+        <prop key="autoStartup">true</prop>
+    </util:properties>
     
     <!-- Lo utilizo como cron para ejecutar el gateway -->
     <int:inbound-channel-adapter id="gatewayTrigger"
                                  channel="requestChannel" 
-                                 expression="new java.util.Date() +' - Request Jenkins' ">
+                                 expression="new java.util.Date() +' - Request Jenkins' " auto-startup="${autoStartup}">
         <int:poller cron="${trigger.request.cron}"/>
     </int:inbound-channel-adapter>
     
@@ -59,7 +75,7 @@
         <int:transformer expression="new groovy.json.JsonSlurper().parseText(payload)"/>
         <!--<int:json-to-object-transformer type="com.parivero.jenkins.speech.domain.Response" />-->
         <!-- Obtengo la colección de jobs -->
-        <int:splitter expression="payload.jobs"/>
+        <int:splitter expression="payload.jobs" />
         <!-- A partir de aqui se procesan los jobs uno a uno -->
         <!-- Proceso solo los jobs activos -->
         <int:filter expression="payload.lastBuild != null"/>
@@ -73,11 +89,15 @@
     </int:chain>
     
     <!--Servicio que convierte el texto en audio medinate google translator-->
-    <int:service-activator input-channel="voiceServiceChannel" ref="voiceService" method="talk"/>
+    <int:service-activator input-channel="voiceServiceChannel" ref="voiceService" method="talk" auto-startup="${autoStartup}"/>
+    
+    <bean id="audio" class="com.gtranslate.Audio" factory-method="getInstance"/>  
+        
     
     <bean id="voiceService" class="com.parivero.jenkins.speech.service.VoiceService">
         <property name="language" value="${jenkins.speech.language}"/>
         <property name="preSound" value="${jenkins.speech.preSound.file}"/>
+        <property name="audio" ref="audio"/>
     </bean>
 
     <!-- logger -->
@@ -86,9 +106,9 @@
     <!-- logger que imprime el json de manera legible -->
     <int:logging-channel-adapter id="loggerJson" expression="new groovy.json.JsonOutput().prettyPrint(payload)" level="DEBUG"/>    
     
-        <!-- Mediante esta configuración se utiliza el servicio de la aplicación annonce 
-         en lugar de reproducir el audio dentro de la misma aplicación  -->
-<!--    <int:channel id="voiceServiceChannel"/>
+    <!-- Mediante esta configuración se utiliza el servicio de la aplicación annonce 
+    en lugar de reproducir el audio dentro de la misma aplicación  -->
+    <!--    <int:channel id="voiceServiceChannel"/>
     <int-http:outbound-channel-adapter channel="voiceServiceChannel" 
                                        charset="UTF-8" 
                                        url="${announcer.url.service}?text={text}&amp;language={language}" 
