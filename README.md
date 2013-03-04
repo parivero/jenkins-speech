@@ -1,4 +1,4 @@
-jenkins-speech [![Build Status](https://secure.travis-ci.org/terbach/Nagixx.png)](http://travis-ci.org/terbach/Nagixx)
+jenkins-speech [![Build Status](https://secure.travis-ci.org/terbach/Nagixx.png)](http://travis-ci.org/parivero/jenkins-speech)
 ==============
 Aplicación java que habla los resultados de Jenkins. Esta aplicación está desarrollada con [Spring Integration](http://www.springsource.org/spring-integration) y utiliza la librería [java-google-translate-text-to-speech](http://code.google.com/p/java-google-translate-text-to-speech/) para la reproducción del audio.
 
