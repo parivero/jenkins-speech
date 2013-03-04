@@ -1,3 +1,4 @@
 language: java
-node:
-  script: mvn install
+script: mvn test
+jdk:
+  - openjdk7
