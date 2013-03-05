@@ -26,6 +26,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = SpringockitoContextLoader.class,
         locations = {"classpath:spring/jenkins-speech-integration-test.xml"})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class VoiceServiceTest {
 
     @Autowired
@@ -36,8 +37,7 @@ public class VoiceServiceTest {
     private Audio audio;
 
     @Test
-    @DirtiesContext
-    public void talk_conMensajeConPreSound_invocaDosPlay() throws Exception {
+    public void talk_messageWithPreSound_executePlayMethodTwoTimes() throws Exception {
         String message = "Hola";
         instance.talk(message);
         verify(audio, times(2)).play((InputStream) any());
@@ -45,8 +45,7 @@ public class VoiceServiceTest {
     }
 
     @Test
-    @DirtiesContext
-    public void talk_conMensajeSinPreSound__invocaUnPlay() throws Exception {
+    public void talk_messageWithoutPreSound_executePlayMethodOneTimes() throws Exception {
         instance.setPreSound("");
         String message = "Hola";
         instance.talk(message);
