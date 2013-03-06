@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class JenkinsJsonMessageBuilder {
 
-    private static String defaultJob = "{\"name\":\"myJob\","
+    private static String jobTemplate = "{\"name\":\"myJob\","
             + "\"lastBuild\":{\"building\":false,\"duration\":371121,"
             + "\"result\":\"SUCCESS\",\"timestamp\":jobTimeStamp}}";
     private Collection<String> jobs;
@@ -23,13 +23,20 @@ public class JenkinsJsonMessageBuilder {
     }
 
     public JenkinsJsonMessageBuilder addJobWithTimeStamp(Long timeStamp) {
-        String newJob = defaultJob.replaceAll("jobTimeStamp", String.valueOf(timeStamp));
+        String newJob = jobTemplate.replaceAll("jobTimeStamp", String.valueOf(timeStamp));
+        jobs.add(newJob);
+        return this;
+    }
+    
+    public JenkinsJsonMessageBuilder addJobWithJobName(String jobName) {
+        String newJob = getDaefaultJob().replaceAll("myJob", jobName);
         jobs.add(newJob);
         return this;
     }
 
     public JenkinsJsonMessageBuilder addJob() {
-        jobs.add(defaultJob.replaceAll("jobTimeStamp", String.valueOf(System.currentTimeMillis())));
+        String newJob = getDaefaultJob();
+        jobs.add(newJob);
         return this;
     }
 
@@ -43,4 +50,9 @@ public class JenkinsJsonMessageBuilder {
         }
         return "{\"jobs\":[" + message + "]}";
     }
+    
+    private String  getDaefaultJob() {
+        return jobTemplate.replaceAll("jobTimeStamp", String.valueOf(System.currentTimeMillis()));
+    }
+    
 }

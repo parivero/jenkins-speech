@@ -41,13 +41,13 @@ public class ChainFlowIntegrationTest {
 
     @Test
     public void chain_withOneJob_returnOneMessage() {
-
-        String message = new JenkinsJsonMessageBuilder().addJob().build();
+        String jobName = "testJob";
+        String message = new JenkinsJsonMessageBuilder().addJobWithJobName(jobName).build();
         System.out.println("Message" + message);
 
         jobsChannel.send(new GenericMessage<>(message));
         Message<String> outMessage = (Message<String>) testChannel.receive();
-        Assert.assertTrue(outMessage.getPayload().contains("myJob"));
+        Assert.assertTrue(outMessage.getPayload().contains(jobName));
     }
 
     @Test

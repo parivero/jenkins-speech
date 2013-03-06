@@ -27,15 +27,15 @@ public class VoiceService {
 
     public void talk(String message) throws IOException, JavaLayerException {
 
-        logger.info("Mensaje a hablar: {}", message);
+        logger.info("Message to talk: {}", message);
 
         if (!preSoundFile.isEmpty()) {
             InputStream startSound = getResource(preSoundFile);
             getAudio().play(startSound);
         }
 
-        InputStream sound = getAudio().getAudio(message, getLanguage());
-        getAudio().play(sound);
+        InputStream sound = audio.getAudio(message, getLanguage());
+        audio.play(sound);
 
     }
 
